@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install)",
+      "Bash(npm install --cache /tmp/npm-cache)",
+      "Bash(npx tsc --noEmit)",
+      "Bash(npm run build)",
+      "Bash(mv next.config.ts next.config.mjs)",
+      "Bash(sed -i '' 's/import type { NextConfig } from .next.//' next.config.mjs)",
+      "Bash(sed -i '' 's/const nextConfig: NextConfig = /const nextConfig = /' next.config.mjs)",
+      "WebFetch(domain:fal.ai)",
+      "WebFetch(domain:docs.krea.ai)",
+      "WebFetch(domain:docs.leonardo.ai)"
+    ]
+  }
+}

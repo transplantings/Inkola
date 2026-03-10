@@ -1,0 +1,12 @@
+
+
+const nextConfig = {
+  images: {
+    remotePatterns: [
+      { protocol: 'https', hostname: '**.fal.media' },
+      { protocol: 'https', hostname: 'fal.media' },
+    ],
+  },
+}
+
+export default nextConfig

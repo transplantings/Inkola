@@ -1,0 +1,19 @@
+# dependencies
+node_modules/
+
+# Next.js
+.next/
+out/
+
+# environment variables — NEVER commit these
+.env.local
+.env
+
+# PartyKit build
+.partykit/
+
+# macOS
+.DS_Store
+
+# TypeScript
+*.tsbuildinfo
