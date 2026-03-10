@@ -1,6 +1,6 @@
 export type GamePhase = 'lobby' | 'word-selection' | 'drawing' | 'round-summary' | 'game-over'
 export type GameMode = 'solo' | 'coop'
-export type AiStyle = 'watercolour' | 'pencil' | 'cubist'
+export type AiStyle = 'watercolour' | 'pencil' | 'cubist' | 'none'
 
 export interface Player {
   id: string

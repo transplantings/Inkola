@@ -7,6 +7,11 @@ export interface StyleDefinition {
 }
 
 export const STYLE_DEFINITIONS: Record<AiStyle, StyleDefinition> = {
+  none: {
+    label: 'No Style',
+    prompt: 'Vibrant colorful illustration, use the sketch as a rough guide: ',
+    color: 'bg-gray-500',
+  },
   watercolour: {
     label: 'Watercolour',
     prompt:

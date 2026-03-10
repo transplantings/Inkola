@@ -86,6 +86,7 @@ export function DrawerView({
           stylePrompt: stylePromptRef.current,
           strength: strengthRef.current,
           guidanceScale: guidanceRef.current,
+          leonardoStyle: 'NONE',
         }),
       })
 

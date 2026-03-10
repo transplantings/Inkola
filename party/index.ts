@@ -1,6 +1,5 @@
 import type * as Party from 'partykit/server'
 import { WORDS } from '../lib/words'
-import { STYLES } from '../lib/gameStyles'
 import type { GameState, GameMode, AiStyle, Player, ChatMessage, ClientMessage } from '../lib/types'
 
 const ROUND_DURATION = 60
@@ -38,7 +37,7 @@ export default class GameRoom implements Party.Server {
       activeDrawerId: null,
       currentWord: '',
       wordChoices: [],
-      aiStyle: 'watercolour',
+      aiStyle: 'none',
       timeLeft: 0,
       coopTurnTimeLeft: 0,
       coopTurnCount: 0,
@@ -145,7 +144,7 @@ export default class GameRoom implements Party.Server {
     this.state.chat = []
 
     this.state.wordChoices = pickWords(this.state.usedWords)
-    this.state.aiStyle = STYLES[Math.floor(Math.random() * STYLES.length)] as AiStyle
+    this.state.aiStyle = 'none'
 
     if (this.state.mode === 'solo') {
       const drawerId = this.state.drawerOrder[this.state.drawerOrderIndex % this.state.drawerOrder.length]
