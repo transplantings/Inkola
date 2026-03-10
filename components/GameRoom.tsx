@@ -22,10 +22,8 @@ export function GameRoom({ roomId }: Props) {
   const [guidanceScale, setGuidanceScale] = useState(1.5)
   const socketRef = useRef<PartySocket | null>(null)
 
-  const playerName =
-    typeof window !== 'undefined' ? localStorage.getItem('playerName') || 'Player' : 'Player'
-
   useEffect(() => {
+    const playerName = localStorage.getItem('playerName') || 'Player'
     const socket = new PartySocket({ host: PARTYKIT_HOST, room: roomId })
     socketRef.current = socket
 
@@ -40,7 +38,7 @@ export function GameRoom({ roomId }: Props) {
     })
 
     return () => socket.close()
-  }, [roomId, playerName])
+  }, [roomId])
 
   const send = (msg: ClientMessage) => socketRef.current?.send(JSON.stringify(msg))
 
