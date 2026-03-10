@@ -25,6 +25,7 @@ export interface GameState {
   currentWord: string
   wordChoices: string[]
   aiStyle: AiStyle
+  currentPrompt: string
   timeLeft: number
   coopTurnTimeLeft: number
   coopTurnCount: number

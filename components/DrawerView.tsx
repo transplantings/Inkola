@@ -5,6 +5,7 @@ import { Tldraw, exportToBlob, Editor } from '@tldraw/tldraw'
 import '@tldraw/tldraw/tldraw.css'
 import type { GameState, ChatMessage } from '@/lib/types'
 import { STYLE_DEFINITIONS } from '@/lib/gameStyles'
+import { GLOBAL_PROMPT_PREFIX } from '@/lib/wordPrompts'
 
 interface Toast extends ChatMessage {
   toastId: number
@@ -55,7 +56,7 @@ export function DrawerView({
   const isActiveRef = useRef(isActive)
   const strengthRef = useRef(strength)
   const guidanceRef = useRef(guidanceScale)
-  const stylePromptRef = useRef(style.prompt)
+  const stylePromptRef = useRef(GLOBAL_PROMPT_PREFIX + state.currentPrompt)
   const isGeneratingRef = useRef(false)
   const onAiImageRef = useRef(onAiImage)
 
@@ -63,7 +64,7 @@ export function DrawerView({
   useEffect(() => { isActiveRef.current = isActive }, [isActive])
   useEffect(() => { strengthRef.current = strength }, [strength])
   useEffect(() => { guidanceRef.current = guidanceScale }, [guidanceScale])
-  useEffect(() => { stylePromptRef.current = style.prompt }, [style.prompt])
+  useEffect(() => { stylePromptRef.current = GLOBAL_PROMPT_PREFIX + state.currentPrompt }, [state.currentPrompt])
   useEffect(() => { onAiImageRef.current = onAiImage }, [onAiImage])
 
   // Update tldraw readonly state when isActive changes

@@ -1,5 +1,5 @@
 import type * as Party from 'partykit/server'
-import { WORDS } from '../lib/words'
+import { WORD_PROMPTS } from '../lib/wordPrompts'
 import type { GameState, GameMode, AiStyle, Player, ChatMessage, ClientMessage } from '../lib/types'
 
 const ROUND_DURATION = 60
@@ -14,10 +14,10 @@ interface ServerState extends GameState {
 }
 
 function pickWords(usedWords: string[]): string[] {
-  const available = WORDS.filter((w) => !usedWords.includes(w))
-  const pool = available.length >= 3 ? available : WORDS
+  const available = WORD_PROMPTS.filter((w) => !usedWords.includes(w.word))
+  const pool = available.length >= 3 ? available : WORD_PROMPTS
   const shuffled = [...pool].sort(() => Math.random() - 0.5)
-  return shuffled.slice(0, 3)
+  return shuffled.slice(0, 3).map((w) => w.word)
 }
 
 export default class GameRoom implements Party.Server {
@@ -38,6 +38,7 @@ export default class GameRoom implements Party.Server {
       currentWord: '',
       wordChoices: [],
       aiStyle: 'none',
+      currentPrompt: '',
       timeLeft: 0,
       coopTurnTimeLeft: 0,
       coopTurnCount: 0,
@@ -167,6 +168,7 @@ export default class GameRoom implements Party.Server {
     if (!this.state.wordChoices.includes(word)) return
 
     this.state.currentWord = word
+    this.state.currentPrompt = WORD_PROMPTS.find((w) => w.word === word)?.prompt ?? ''
     this.state.usedWords.push(word)
     this.state.phase = 'drawing'
     this.state.timeLeft = this.state.mode === 'coop' ? COOP_TURN_DURATION * COOP_TURNS_EACH * 2 : ROUND_DURATION
