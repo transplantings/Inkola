@@ -144,7 +144,7 @@ export function DrawerView({
   const activePlayer = players.find((p) => p.id === activeDrawerId)
 
   return (
-    <div className="flex flex-col h-screen bg-gray-900">
+    <div className="flex flex-col h-screen bg-gray-900 relative">
       {/* Top bar */}
       <div className="flex items-center justify-between px-4 py-2 bg-gray-800 border-b border-gray-700 flex-shrink-0 gap-4">
         <span className="text-gray-400 text-sm whitespace-nowrap">Round {round}/{totalRounds}</span>
@@ -181,23 +181,6 @@ export function DrawerView({
             </div>
           )}
           <div className="absolute bottom-2 left-2 text-xs text-gray-500 pointer-events-none z-10">Raw sketch</div>
-
-          {/* Guess toasts */}
-          <div className="absolute top-3 right-3 flex flex-col gap-2 items-end z-20 pointer-events-none max-w-[220px]">
-            {toasts.map((t) => (
-              <div
-                key={t.toastId}
-                className={`px-3 py-2 rounded-2xl text-sm font-bold shadow-lg border-2 animate-fade-in
-                  ${t.correct
-                    ? 'bg-emerald-500 border-emerald-300 text-white'
-                    : 'bg-gray-900/90 border-white/20 text-white'}`}
-                style={{ fontFamily: 'system-ui, sans-serif', letterSpacing: '0.01em' }}
-              >
-                <span className="text-xs font-normal opacity-70">{t.playerName}: </span>
-                {t.text}
-              </div>
-            ))}
-          </div>
         </div>
 
         {/* Right: AI preview + sliders */}
@@ -239,6 +222,24 @@ export function DrawerView({
           </div>
         </div>
       </div>
+
+      {/* Guess toasts — centered over both panels, above tldraw */}
+      {toasts.length > 0 && (
+        <div className="absolute inset-0 pointer-events-none z-50 flex flex-col items-center justify-center gap-4">
+          {toasts.map((t) => (
+            <div
+              key={t.toastId}
+              className={`px-6 py-4 rounded-3xl text-xl font-extrabold shadow-2xl border-4 animate-fade-in text-center max-w-xs
+                ${t.correct
+                  ? 'bg-emerald-400 border-emerald-200 text-white drop-shadow-[0_0_20px_rgba(52,211,153,0.8)]'
+                  : 'bg-indigo-600 border-indigo-300 text-white drop-shadow-[0_0_16px_rgba(99,102,241,0.7)]'}`}
+            >
+              <div className="text-xs font-normal opacity-75 mb-1 uppercase tracking-widest">{t.playerName}</div>
+              {t.text}
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   )
 }

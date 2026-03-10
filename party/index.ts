@@ -184,7 +184,13 @@ export default class GameRoom implements Party.Server {
     for (let i = 0; i < word.length; i++) {
       if (word[i] !== ' ') positions.push(i)
     }
-    this.state.letterPositions = [...positions].sort(() => Math.random() - 0.5)
+    // Fisher-Yates shuffle for unbiased random reveal order
+    const shuffled = [...positions]
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+    }
+    this.state.letterPositions = shuffled
     this.state.revealedIndices = []
 
     // Hint schedule: timeLeft values at which each letter is revealed

@@ -17,6 +17,11 @@ export function GuesserView({ state, myId, onGuess }: Props) {
   const hasGuessed = correctGuessers.includes(myId)
   const style = STYLE_DEFINITIONS[aiStyle]
 
+  // Hangman timing: hide strip first 10s, show blanks 10-20s, letters from 20s
+  const roundDuration = state.mode === 'coop' ? 40 : 60
+  const elapsed = roundDuration - timeLeft
+  const showHangmanStrip = elapsed >= 10
+
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [chat])
@@ -43,22 +48,24 @@ export function GuesserView({ state, myId, onGuess }: Props) {
         </span>
       </div>
 
-      {/* Hangman word hint */}
-      <div className="flex justify-center items-end gap-1 py-2 px-4 bg-gray-900 border-b border-gray-800 flex-wrap">
-        {state.currentWord.split('').map((char, i) => {
-          if (char === ' ') return <span key={i} className="w-4 inline-block" />
-          const isRevealed = state.revealedIndices.includes(i)
-          return (
-            <span
-              key={i}
-              className={`inline-flex items-end justify-center w-6 pb-0.5 border-b-2 text-base font-bold font-mono tracking-widest
-                ${isRevealed ? 'text-white border-white' : 'text-gray-900 border-gray-600'}`}
-            >
-              {isRevealed ? char.toUpperCase() : '_'}
-            </span>
-          )
-        })}
-      </div>
+      {/* Hangman word hint — hidden first 10s, blanks from 10s, letters from ~20s */}
+      {showHangmanStrip && (
+        <div className="flex justify-center items-end gap-1 py-2 px-4 bg-gray-900 border-b border-gray-800 flex-wrap">
+          {state.currentWord.split('').map((char, i) => {
+            if (char === ' ') return <span key={i} className="w-4 inline-block" />
+            const isRevealed = state.revealedIndices.includes(i)
+            return (
+              <span
+                key={i}
+                className={`inline-flex items-end justify-center w-6 pb-0.5 border-b-2 text-base font-bold font-mono tracking-widest
+                  ${isRevealed ? 'text-white border-white' : 'text-gray-900 border-gray-600'}`}
+              >
+                {isRevealed ? char.toUpperCase() : '_'}
+              </span>
+            )
+          })}
+        </div>
+      )}
 
       <div className="flex flex-col md:flex-row flex-1 overflow-hidden">
         {/* AI image */}
