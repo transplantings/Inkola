@@ -43,6 +43,23 @@ export function GuesserView({ state, myId, onGuess }: Props) {
         </span>
       </div>
 
+      {/* Hangman word hint */}
+      <div className="flex justify-center items-end gap-1 py-2 px-4 bg-gray-900 border-b border-gray-800 flex-wrap">
+        {state.currentWord.split('').map((char, i) => {
+          if (char === ' ') return <span key={i} className="w-4 inline-block" />
+          const isRevealed = state.revealedIndices.includes(i)
+          return (
+            <span
+              key={i}
+              className={`inline-flex items-end justify-center w-6 pb-0.5 border-b-2 text-base font-bold font-mono tracking-widest
+                ${isRevealed ? 'text-white border-white' : 'text-gray-900 border-gray-600'}`}
+            >
+              {isRevealed ? char.toUpperCase() : '_'}
+            </span>
+          )
+        })}
+      </div>
+
       <div className="flex flex-col md:flex-row flex-1 overflow-hidden">
         {/* AI image */}
         <div className="flex-1 flex items-center justify-center bg-gray-950 p-4 min-h-0">

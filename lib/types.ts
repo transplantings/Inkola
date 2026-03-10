@@ -26,6 +26,7 @@ export interface GameState {
   wordChoices: string[]
   aiStyle: AiStyle
   currentPrompt: string
+  revealedIndices: number[]
   timeLeft: number
   coopTurnTimeLeft: number
   coopTurnCount: number

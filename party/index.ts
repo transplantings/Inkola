@@ -11,6 +11,8 @@ interface ServerState extends GameState {
   drawerOrder: string[]
   drawerOrderIndex: number
   usedWords: string[]
+  letterPositions: number[]   // shuffled non-space char indices, server-only
+  hintAtTimeLeft: number[]    // timeLeft thresholds for each reveal, server-only
 }
 
 function pickWords(usedWords: string[]): string[] {
@@ -39,6 +41,7 @@ export default class GameRoom implements Party.Server {
       wordChoices: [],
       aiStyle: 'none',
       currentPrompt: '',
+      revealedIndices: [],
       timeLeft: 0,
       coopTurnTimeLeft: 0,
       coopTurnCount: 0,
@@ -52,6 +55,8 @@ export default class GameRoom implements Party.Server {
       drawerOrder: [],
       drawerOrderIndex: 0,
       usedWords: [],
+      letterPositions: [],
+      hintAtTimeLeft: [],
     }
   }
 
@@ -171,7 +176,31 @@ export default class GameRoom implements Party.Server {
     this.state.currentPrompt = WORD_PROMPTS.find((w) => w.word === word)?.prompt ?? ''
     this.state.usedWords.push(word)
     this.state.phase = 'drawing'
-    this.state.timeLeft = this.state.mode === 'coop' ? COOP_TURN_DURATION * COOP_TURNS_EACH * 2 : ROUND_DURATION
+    const roundDuration = this.state.mode === 'coop' ? COOP_TURN_DURATION * COOP_TURNS_EACH * 2 : ROUND_DURATION
+    this.state.timeLeft = roundDuration
+
+    // Build shuffled letter positions (non-space chars) for random reveal order
+    const positions: number[] = []
+    for (let i = 0; i < word.length; i++) {
+      if (word[i] !== ' ') positions.push(i)
+    }
+    this.state.letterPositions = [...positions].sort(() => Math.random() - 0.5)
+    this.state.revealedIndices = []
+
+    // Hint schedule: timeLeft values at which each letter is revealed
+    // 1st: elapsed 10-20s, 2nd: elapsed 20-30s, 3rd: elapsed 40-50s, then every 11s
+    const rand = (lo: number, hi: number) => Math.floor(Math.random() * (hi - lo + 1)) + lo
+    const t1 = roundDuration - rand(10, 20)
+    const t2 = roundDuration - rand(20, 30)
+    const t3 = roundDuration - rand(40, 50)
+    const schedule = [t1, t2, t3].filter((t) => t > 0)
+    let next = (schedule[schedule.length - 1] ?? 0) - 11
+    while (next > 0 && schedule.length < positions.length) {
+      schedule.push(next)
+      next -= 11
+    }
+    this.state.hintAtTimeLeft = schedule
+
     this.startTimer()
     this.broadcast()
   }
@@ -195,6 +224,24 @@ export default class GameRoom implements Party.Server {
               this.state.activeDrawerId = this.state.drawerIds[idx]
               this.state.coopTurnTimeLeft = COOP_TURN_DURATION
             }
+          }
+        }
+
+        // Reveal next letter hint if threshold crossed
+        const nextHintIdx = this.state.revealedIndices.length
+        if (
+          nextHintIdx < this.state.hintAtTimeLeft.length &&
+          nextHintIdx < this.state.letterPositions.length &&
+          this.state.timeLeft <= this.state.hintAtTimeLeft[nextHintIdx]
+        ) {
+          this.state.revealedIndices = [
+            ...this.state.revealedIndices,
+            this.state.letterPositions[nextHintIdx],
+          ]
+          // End round early if all letters revealed
+          if (this.state.revealedIndices.length >= this.state.letterPositions.length) {
+            this.endRound()
+            return
           }
         }
 
@@ -301,7 +348,7 @@ export default class GameRoom implements Party.Server {
   }
 
   clientState(): GameState {
-    const { drawerOrder, drawerOrderIndex, usedWords, ...rest } = this.state
+    const { drawerOrder, drawerOrderIndex, usedWords, letterPositions, hintAtTimeLeft, ...rest } = this.state
     return rest
   }
 
