@@ -3,8 +3,12 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Tldraw, exportToBlob, Editor } from '@tldraw/tldraw'
 import '@tldraw/tldraw/tldraw.css'
-import type { GameState } from '@/lib/types'
+import type { GameState, ChatMessage } from '@/lib/types'
 import { STYLE_DEFINITIONS } from '@/lib/gameStyles'
+
+interface Toast extends ChatMessage {
+  toastId: number
+}
 
 interface Props {
   state: GameState
@@ -30,6 +34,20 @@ export function DrawerView({
   const { currentWord, aiStyle, aiImage, timeLeft, round, totalRounds, mode, activeDrawerId, players, coopTurnTimeLeft } = state
   const style = STYLE_DEFINITIONS[aiStyle]
   const [isGenerating, setIsGenerating] = useState(false)
+  const [toasts, setToasts] = useState<Toast[]>([])
+  const toastCounterRef = useRef(0)
+  const lastChatLengthRef = useRef(0)
+
+  // Show incoming guesses as toasts
+  useEffect(() => {
+    const newMsgs = state.chat.slice(lastChatLengthRef.current)
+    lastChatLengthRef.current = state.chat.length
+    newMsgs.forEach((msg) => {
+      const toastId = toastCounterRef.current++
+      setToasts((prev) => [...prev, { ...msg, toastId }])
+      setTimeout(() => setToasts((prev) => prev.filter((t) => t.toastId !== toastId)), 3500)
+    })
+  }, [state.chat])
 
   // Use refs so the store listener always has fresh values without needing re-registration
   const editorRef = useRef<Editor | null>(null)
@@ -109,6 +127,7 @@ export function DrawerView({
   const handleMount = useCallback((editor: Editor) => {
     editorRef.current = editor
     editor.updateInstanceState({ isReadonly: !isActiveRef.current })
+    editor.setCurrentTool('draw')
 
     editor.store.listen(
       () => {
@@ -147,9 +166,9 @@ export function DrawerView({
       )}
 
       {/* Split screen */}
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-col md:flex-row flex-1 overflow-hidden">
         {/* Left: canvas */}
-        <div className="flex-1 relative border-r border-gray-700">
+        <div className="flex-1 relative border-b border-gray-700 md:border-b-0 md:border-r md:border-gray-700 min-h-0">
           <div className="absolute inset-0">
             <Tldraw onMount={handleMount} />
           </div>
@@ -161,10 +180,27 @@ export function DrawerView({
             </div>
           )}
           <div className="absolute bottom-2 left-2 text-xs text-gray-500 pointer-events-none z-10">Raw sketch</div>
+
+          {/* Guess toasts */}
+          <div className="absolute top-3 right-3 flex flex-col gap-2 items-end z-20 pointer-events-none max-w-[220px]">
+            {toasts.map((t) => (
+              <div
+                key={t.toastId}
+                className={`px-3 py-2 rounded-2xl text-sm font-bold shadow-lg border-2 animate-fade-in
+                  ${t.correct
+                    ? 'bg-emerald-500 border-emerald-300 text-white'
+                    : 'bg-gray-900/90 border-white/20 text-white'}`}
+                style={{ fontFamily: 'system-ui, sans-serif', letterSpacing: '0.01em' }}
+              >
+                <span className="text-xs font-normal opacity-70">{t.playerName}: </span>
+                {t.text}
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* Right: AI preview + sliders */}
-        <div className="flex-1 flex flex-col bg-gray-950">
+        <div className="flex flex-col bg-gray-950 md:flex-1 h-48 md:h-auto">
           <div className="flex-1 flex items-center justify-center p-4">
             {aiImage ? (
               <img src={aiImage} alt="AI output" className="max-w-full max-h-full object-contain rounded-xl shadow-2xl" />

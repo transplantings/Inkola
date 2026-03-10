@@ -43,9 +43,9 @@ export function GuesserView({ state, myId, onGuess }: Props) {
         </span>
       </div>
 
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-col md:flex-row flex-1 overflow-hidden">
         {/* AI image */}
-        <div className="flex-1 flex items-center justify-center bg-gray-950 p-4">
+        <div className="flex-1 flex items-center justify-center bg-gray-950 p-4 min-h-0">
           {aiImage ? (
             <img
               src={aiImage}
@@ -60,10 +60,10 @@ export function GuesserView({ state, myId, onGuess }: Props) {
           )}
         </div>
 
-        {/* Chat sidebar */}
-        <div className="w-72 flex flex-col bg-gray-800 border-l border-gray-700">
+        {/* Chat sidebar — full width on mobile, fixed sidebar on desktop */}
+        <div className="flex flex-col bg-gray-800 border-t border-gray-700 md:border-t-0 md:border-l md:w-72">
           {/* Score strip */}
-          <div className="px-3 py-2 bg-gray-850 border-b border-gray-700 text-xs text-gray-400 space-y-0.5">
+          <div className="px-3 py-2 border-b border-gray-700 text-xs text-gray-400 space-y-0.5">
             {[...players]
               .sort((a, b) => (scores[b.id] || 0) - (scores[a.id] || 0))
               .map((p) => (
@@ -76,8 +76,8 @@ export function GuesserView({ state, myId, onGuess }: Props) {
               ))}
           </div>
 
-          {/* Chat messages */}
-          <div className="flex-1 overflow-y-auto px-3 py-2 space-y-1">
+          {/* Chat messages — hidden on mobile to save space */}
+          <div className="hidden md:block flex-1 overflow-y-auto px-3 py-2 space-y-1">
             {chat.map((msg, i) => (
               <div key={i} className={`text-sm ${msg.correct ? 'text-emerald-400 font-semibold' : 'text-gray-300'}`}>
                 <span className="font-medium text-gray-400">{msg.playerName}: </span>
@@ -102,10 +102,11 @@ export function GuesserView({ state, myId, onGuess }: Props) {
                   className="flex-1 px-3 py-2 bg-gray-700 text-white text-sm rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder-gray-500"
                   maxLength={60}
                   autoComplete="off"
+                  autoCapitalize="off"
                 />
                 <button
                   onClick={submit}
-                  className="px-3 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm rounded-lg"
+                  className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm rounded-lg"
                 >
                   →
                 </button>
