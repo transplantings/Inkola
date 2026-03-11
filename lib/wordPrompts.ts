@@ -182,7 +182,47 @@ export const WORD_PROMPTS: WordPrompt[] = [
   { word: 'Weather Vane',   prompt: 'weather vane, directional arrow, N S E W arms, rooster or arrow on spike top' },
 ]
 
-export function pickRandom(exclude?: WordPrompt): WordPrompt {
-  const pool = exclude ? WORD_PROMPTS.filter((w) => w.word !== exclude.word) : WORD_PROMPTS
-  return pool[Math.floor(Math.random() * pool.length)]
+export function pickRandom(exclude?: WordPrompt, pool: WordPrompt[] = WORD_PROMPTS): WordPrompt {
+  const filtered = exclude ? pool.filter((w) => w.word !== exclude.word) : pool
+  return filtered[Math.floor(Math.random() * filtered.length)]
+}
+
+// Extra words available in test mode only
+const TEST_EXTRA_PROMPTS: WordPrompt[] = [
+  { word: 'Chameleon',     prompt: 'chameleon, lizard on branch, triangular body, coiled curling tail, large round eyes' },
+  { word: 'Gorilla',       prompt: 'gorilla, large primate, knuckle walk, wide oval body, broad flat nose, chest beating' },
+  { word: 'Manta Ray',     prompt: 'manta ray, flat wide diamond shape, long thin whip tail, underwater gliding, fins' },
+  { word: 'Camel',         prompt: 'camel, desert animal, one or two humps on back, oval body, long neck, sand dunes' },
+  { word: 'Seahorse',      prompt: 'seahorse, curled tail, horse-like head, vertical swimming, tiny fins, ocean' },
+  { word: 'Surfboard',     prompt: 'surfboard, long narrow board, pointed oval ends, flat rectangle, fins underneath' },
+  { word: 'Typewriter',    prompt: 'typewriter, rectangle machine, rows of circular keys, paper roll, carriage bar' },
+  { word: 'Anvil',         prompt: 'anvil, heavy metal T-shape block, flat wide top, narrow tapered waist, blacksmith' },
+  { word: 'Catapult',      prompt: 'catapult, medieval siege weapon, long bent throwing arm, wheeled cart, cup sling' },
+  { word: 'Escalator',     prompt: 'escalator, moving diagonal staircase, steps going up, handrail, mall building' },
+  { word: 'Mailbox',       prompt: 'mailbox, rectangular box on post, raised flag arm, letter slot, roadside' },
+  { word: 'Croissant',     prompt: 'croissant, crescent moon pastry, curved C-shape, tapered ends, flaky layers' },
+  { word: 'Ramen',         prompt: 'ramen, bowl of noodles, wavy tangled lines in broth, soft boiled egg, chopsticks' },
+  { word: 'Lollipop',      prompt: 'lollipop, round candy circle on vertical stick, swirled spiral pattern, sweet' },
+  { word: 'Waffle',        prompt: 'waffle, square golden grid, honeycomb crosshatch lines, flat square shape' },
+  { word: 'Swamp',         prompt: 'swamp, murky water, twisted gnarled trees, drooping hanging branches, mist, dark' },
+  { word: 'Canyon',        prompt: 'canyon, deep gorge, sheer vertical rock walls, V-shape cut, horizontal layers' },
+  { word: 'Oasis',         prompt: 'oasis, palm trees around oval pool, desert sand, water reflection, green island' },
+  { word: 'Fencing',       prompt: 'fencing, two fencers, thin sword blades, forward lunge stance, wire mesh mask' },
+  { word: 'Kayaking',      prompt: 'kayak, narrow pointed boat, person inside, double-ended paddle across, river' },
+  { word: 'Rock Climbing', prompt: 'rock climber, person on cliff face, harness rope attached, hand and foot holds' },
+  { word: 'Dart Board',    prompt: 'dart board, circular board with rings, bullseye center, dart embedded at angle' },
+  { word: 'On the Fence',  prompt: 'person sitting balanced on top of wooden fence, undecided, awkward perch' },
+  { word: 'Spill the Beans', prompt: 'bag tipped over, beans scattering out, spilled secret, scattered round shapes' },
+  { word: 'Head in the Clouds', prompt: 'person standing, head floating up inside fluffy cloud, daydreaming, sky' },
+  { word: 'Break the Ice', prompt: 'person with pickaxe breaking frozen ice sheet, chunks flying, first meeting' },
+  { word: 'Spin the Bottle', prompt: 'glass bottle spinning on floor, circle of seated people, pointing arrow' },
+  { word: 'Paper Boat',    prompt: 'paper origami boat, folded triangle sail, floating on water, simple angular folds' },
+  { word: 'Campfire',      prompt: 'campfire, logs in triangle stack, teardrop flame shapes, glowing embers, night' },
+  { word: 'Kite',          prompt: 'kite, diamond rhombus shape, long string tail with bows, flying in sky, wind' },
+]
+
+const TEST_WORD_PROMPTS: WordPrompt[] = [...WORD_PROMPTS, ...TEST_EXTRA_PROMPTS]
+
+export function pickRandomTest(exclude?: WordPrompt): WordPrompt {
+  return pickRandom(exclude, TEST_WORD_PROMPTS)
 }

@@ -3,7 +3,7 @@
 import { useCallback, useRef, useState } from 'react'
 import { Tldraw, exportToBlob, Editor } from '@tldraw/tldraw'
 import '@tldraw/tldraw/tldraw.css'
-import { pickRandom, GLOBAL_PROMPT_PREFIX } from '@/lib/wordPrompts'
+import { pickRandomTest, GLOBAL_PROMPT_PREFIX } from '@/lib/wordPrompts'
 import type { WordPrompt } from '@/lib/wordPrompts'
 
 const LEONARDO_STYLES = [
@@ -19,7 +19,7 @@ export function TestView() {
   const debounceRef = useRef<ReturnType<typeof setTimeout>>()
   const isGeneratingRef = useRef(false)
 
-  const [round, setRound] = useState<WordPrompt>(pickRandom)
+  const [round, setRound] = useState<WordPrompt>(pickRandomTest)
   // null = show round.word; string = user-typed override
   const [customWord, setCustomWord] = useState<string | null>(null)
   const displayWord = customWord ?? round.word
@@ -55,7 +55,7 @@ export function TestView() {
   const updateStyle = (v: LeonardoStyle) => { setLeonardoStyle(v); styleRef.current = v }
 
   const newRound = () => {
-    const next = pickRandom(roundRef.current)
+    const next = pickRandomTest(roundRef.current)
     setRound(next)
     roundRef.current = next
     setCustomWord(null)
@@ -140,11 +140,11 @@ export function TestView() {
           <div className="flex items-end gap-2">
             {/* Word input */}
             <div className="flex-1 min-w-0">
-              <p className="text-gray-500 text-[9px] uppercase tracking-widest leading-none mb-0.5">Draw this</p>
+              <p className="text-gray-500 text-[8px] uppercase tracking-widest leading-none mb-0.5">Draw this</p>
               <input
                 value={displayWord}
                 onChange={(e) => setCustomWord(e.target.value)}
-                className="text-base font-extrabold text-white bg-transparent border-b border-transparent hover:border-gray-600 focus:border-indigo-500 focus:outline-none w-full py-0 transition-colors"
+                className="text-sm font-extrabold text-white bg-transparent border-b border-transparent hover:border-gray-600 focus:border-indigo-500 focus:outline-none w-full py-0 transition-colors"
                 placeholder="Type a word…"
               />
             </div>
@@ -152,13 +152,13 @@ export function TestView() {
             <div className="flex items-center gap-1.5 flex-shrink-0">
               <button
                 onClick={newRound}
-                className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white font-bold rounded-lg text-xs touch-manipulation whitespace-nowrap"
+                className="px-2 py-1 bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white font-bold rounded-md text-[10px] touch-manipulation whitespace-nowrap"
               >
                 New
               </button>
               <button
                 onClick={() => toggleCustomPrompt(!useCustomPrompt)}
-                className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold border touch-manipulation whitespace-nowrap
+                className={`px-2 py-1 rounded-md text-[10px] font-semibold border touch-manipulation whitespace-nowrap
                   ${useCustomPrompt ? 'bg-amber-500 border-amber-400 text-white' : 'bg-gray-700 border-gray-600 text-gray-300'}`}
               >
                 {useCustomPrompt ? 'Prompt ✎' : 'Prompt'}
