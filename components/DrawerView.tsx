@@ -229,13 +229,14 @@ export function DrawerView({
           {toasts.map((t) => (
             <div
               key={t.toastId}
-              className={`px-6 py-4 rounded-3xl text-xl font-extrabold shadow-2xl border-4 animate-fade-in text-center max-w-xs
+              className={`px-6 py-4 rounded-3xl text-lg font-extrabold shadow-2xl border-4 animate-fade-in text-center max-w-xs
                 ${t.correct
                   ? 'bg-emerald-400 border-emerald-200 text-white drop-shadow-[0_0_20px_rgba(52,211,153,0.8)]'
-                  : 'bg-indigo-600 border-indigo-300 text-white drop-shadow-[0_0_16px_rgba(99,102,241,0.7)]'}`}
+                  : 'bg-sky-400 border-sky-200 text-white drop-shadow-[0_0_16px_rgba(56,189,248,0.7)]'}`}
             >
-              <div className="text-xs font-normal opacity-75 mb-1 uppercase tracking-widest">{t.playerName}</div>
-              {t.text}
+              <span className="font-medium">{t.playerName}</span>
+              <span className="font-normal opacity-80"> guessed </span>
+              <span>&ldquo;{t.text}&rdquo;</span>
             </div>
           ))}
         </div>
