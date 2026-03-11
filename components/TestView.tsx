@@ -224,36 +224,56 @@ export function TestView() {
         </div>
       </div>
 
-      {/* ── MAIN AREA — always flex row: 70/30 mobile, 50/50 desktop ── */}
+      {/* ── MAIN AREA ── */}
       <div className="flex flex-1 overflow-hidden">
 
-        {/* Canvas: 70% on mobile, 50% on desktop */}
-        <div className="flex-[7] md:flex-1 relative border-r border-gray-700 min-w-0">
+        {/* Canvas: full width on mobile (AI overlaid), 50% on desktop */}
+        <div className="flex-1 relative md:border-r md:border-gray-700">
           <div className="absolute inset-0">
             <Tldraw onMount={handleMount} />
           </div>
+
+          {/* Mobile AI overlay — 40vw square, top-right, floats above canvas */}
+          <div
+            className="md:hidden absolute z-10 rounded-2xl overflow-hidden shadow-2xl border-2 border-indigo-900/60 bg-gray-950"
+            style={{ width: '40vw', height: '40vw', top: '10px', right: '10px' }}
+          >
+            {aiImage ? (
+              <img src={aiImage} alt="AI" className="w-full h-full object-cover" />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center">
+                {isGenerating
+                  ? <div className="w-7 h-7 border-2 border-gray-600 border-t-indigo-500 rounded-full animate-spin" />
+                  : <p className="text-[9px] text-gray-600 text-center px-2 leading-tight">AI preview</p>
+                }
+              </div>
+            )}
+          </div>
+
           <div className="absolute bottom-2 left-2 text-xs text-gray-500 pointer-events-none z-10">Raw sketch</div>
         </div>
 
-        {/* AI panel: 30% on mobile, 50% on desktop */}
-        <div className="flex-[3] md:flex-1 flex flex-col bg-gray-950 min-w-0">
-          {/* AI image */}
-          <div className="flex-1 flex items-center justify-center p-1 md:p-4 min-h-0">
+        {/* Desktop-only right panel */}
+        <div className="hidden md:flex flex-1 flex-col bg-gray-950">
+          <div className="flex-1 flex items-center justify-center p-4">
             {aiImage ? (
-              <img src={aiImage} alt="AI output" className="max-w-full max-h-full object-contain rounded-lg md:rounded-xl shadow-2xl" />
+              <img src={aiImage} alt="AI output" className="max-w-full max-h-full object-contain rounded-xl shadow-2xl" />
             ) : (
-              <div className="text-center text-gray-600">
+              <div className="text-center space-y-3 text-gray-600">
                 {isGenerating ? (
-                  <div className="w-6 h-6 md:w-12 md:h-12 border-2 md:border-4 border-gray-600 border-t-indigo-500 rounded-full animate-spin mx-auto" />
+                  <>
+                    <div className="w-12 h-12 border-4 border-gray-600 border-t-indigo-500 rounded-full animate-spin mx-auto" />
+                    <p className="text-sm">Generating…</p>
+                  </>
                 ) : (
-                  <p className="text-[9px] md:text-sm px-1 leading-tight">Draw to see AI</p>
+                  <p className="text-sm">Draw on the left to see the AI version</p>
                 )}
               </div>
             )}
           </div>
 
-          {/* Desktop-only controls */}
-          <div className="hidden md:block px-4 py-4 border-t border-gray-800 space-y-3 flex-shrink-0">
+          {/* Desktop controls */}
+          <div className="px-4 py-4 border-t border-gray-800 space-y-3 flex-shrink-0">
             <p className="text-gray-500 text-xs uppercase tracking-widest">AI Controls</p>
             <label className="block space-y-1">
               <span className="text-xs text-gray-400">Leonardo style preset</span>
