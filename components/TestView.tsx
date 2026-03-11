@@ -133,7 +133,7 @@ export function TestView() {
   }, [runCapture])
 
   return (
-    <div className="flex flex-col h-screen bg-gray-900 relative">
+    <div className="fixed inset-0 flex flex-col bg-gray-900 overflow-hidden">
 
       {/* ── TOP BAR ── */}
       <div className="flex-shrink-0 bg-gray-800 border-b border-gray-700">
@@ -307,10 +307,11 @@ export function TestView() {
         </div>
       </div>
 
-      {/* ── MOBILE CONTROLS TOGGLE — overlays bottom of canvas ── */}
-      <div className="md:hidden absolute bottom-0 left-0 right-0 z-20">
+      {/* ── MOBILE CONTROLS — pill button bottom-left, panel expands upward ── */}
+      <div className="md:hidden absolute bottom-4 left-4 z-20">
         {showControls && (
-          <div className="bg-gray-900/96 backdrop-blur border-t border-gray-700 px-3 pt-2 pb-1.5 space-y-1.5">
+          <div className="absolute bottom-full mb-2 left-0 bg-gray-900/97 backdrop-blur border border-gray-700 rounded-2xl px-3 pt-3 pb-2.5 space-y-2 shadow-2xl"
+            style={{ width: 'calc(100vw - 2rem)' }}>
             <div className="flex gap-3">
               <label className="flex-1 space-y-0.5">
                 <div className="flex justify-between text-[9px] text-gray-400">
@@ -330,16 +331,16 @@ export function TestView() {
               </label>
             </div>
             <select value={leonardoStyle} onChange={(e) => updateStyle(e.target.value as LeonardoStyle)}
-              className="w-full px-2 py-1 rounded bg-gray-800 text-white text-[10px] focus:outline-none">
+              className="w-full px-2 py-1.5 rounded-lg bg-gray-800 text-white text-[10px] focus:outline-none">
               {LEONARDO_STYLES.map((s) => <option key={s} value={s}>{s}</option>)}
             </select>
           </div>
         )}
         <button
           onClick={() => setShowControls(v => !v)}
-          className="w-full py-1.5 bg-gray-800/95 backdrop-blur text-[10px] text-gray-400 font-semibold border-t border-gray-700 touch-manipulation"
+          className="px-3 py-1.5 bg-gray-800/95 backdrop-blur border border-gray-700 rounded-full text-[10px] text-gray-300 font-semibold shadow-lg touch-manipulation whitespace-nowrap"
         >
-          {showControls ? '▾ Hide Controls' : '▴ AI Controls'}
+          {showControls ? '✕ Close' : '⚙ IMG sliders'}
         </button>
       </div>
 
