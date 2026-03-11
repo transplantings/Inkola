@@ -3,7 +3,7 @@
 import { useCallback, useRef, useState } from 'react'
 import { Tldraw, exportToBlob, Editor } from '@tldraw/tldraw'
 import '@tldraw/tldraw/tldraw.css'
-import { WORD_PROMPTS, pickRandom, GLOBAL_PROMPT_PREFIX } from '@/lib/wordPrompts'
+import { pickRandom, GLOBAL_PROMPT_PREFIX } from '@/lib/wordPrompts'
 import type { WordPrompt } from '@/lib/wordPrompts'
 
 const LEONARDO_STYLES = [
@@ -25,12 +25,26 @@ export function TestView() {
   const [strength, setStrength] = useState(0.55)
   const [guidance, setGuidance] = useState(1.5)
   const [leonardoStyle, setLeonardoStyle] = useState<LeonardoStyle>('NONE')
+  const [useCustomPrompt, setUseCustomPrompt] = useState(false)
+  const [customPromptText, setCustomPromptText] = useState('')
 
   // Refs so the store listener always has fresh values
   const strengthRef = useRef(strength)
   const guidanceRef = useRef(guidance)
   const styleRef = useRef(leonardoStyle)
   const roundRef = useRef(round)
+  const useCustomPromptRef = useRef(useCustomPrompt)
+  const customPromptTextRef = useRef(customPromptText)
+
+  const updateCustomPromptText = (v: string) => { setCustomPromptText(v); customPromptTextRef.current = v }
+  const toggleCustomPrompt = (on: boolean) => {
+    setUseCustomPrompt(on)
+    useCustomPromptRef.current = on
+    // Pre-fill with current word prompt when switching on
+    if (on && !customPromptTextRef.current) {
+      updateCustomPromptText(roundRef.current.prompt)
+    }
+  }
 
   const updateStrength = (v: number) => { setStrength(v); strengthRef.current = v }
   const updateGuidance = (v: number) => { setGuidance(v); guidanceRef.current = v }
@@ -77,7 +91,7 @@ export function TestView() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           imageBase64: base64,
-          stylePrompt: GLOBAL_PROMPT_PREFIX + roundRef.current.prompt,
+          stylePrompt: GLOBAL_PROMPT_PREFIX + (useCustomPromptRef.current ? customPromptTextRef.current : roundRef.current.prompt),
           strength: strengthRef.current,
           guidanceScale: guidanceRef.current,
           leonardoStyle: styleRef.current,
@@ -113,28 +127,53 @@ export function TestView() {
   return (
     <div className="flex flex-col h-screen bg-gray-900">
       {/* Top bar */}
-      <div className="flex items-center px-4 py-2 bg-gray-800 border-b border-gray-700 flex-shrink-0 gap-4">
-        {/* Word */}
-        <div className="flex-1">
-          <p className="text-gray-500 text-xs uppercase tracking-widest">Draw this</p>
-          <p className="text-2xl font-extrabold text-white">{round.word}</p>
+      <div className="flex flex-col px-4 py-2 bg-gray-800 border-b border-gray-700 flex-shrink-0 gap-2">
+        <div className="flex items-center gap-4">
+          {/* Word */}
+          <div className="flex-1 min-w-0">
+            <p className="text-gray-500 text-xs uppercase tracking-widest">Draw this</p>
+            <p className="text-2xl font-extrabold text-white truncate">{round.word}</p>
+          </div>
+
+          {/* Buttons */}
+          <button
+            onClick={newRound}
+            className="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl transition-colors text-sm whitespace-nowrap"
+          >
+            New Round
+          </button>
+
+          {/* Custom prompt toggle */}
+          <button
+            onClick={() => toggleCustomPrompt(!useCustomPrompt)}
+            className={`px-4 py-2 rounded-xl text-sm font-semibold border-2 transition-colors whitespace-nowrap
+              ${useCustomPrompt
+                ? 'bg-amber-500 border-amber-300 text-white'
+                : 'bg-gray-700 border-gray-600 text-gray-300 hover:border-amber-500 hover:text-amber-400'}`}
+          >
+            {useCustomPrompt ? 'Custom ✎' : 'Custom prompt'}
+          </button>
+
+          <a href="/" className="text-xs text-gray-600 hover:text-gray-400 underline whitespace-nowrap">← Back</a>
         </div>
 
-        {/* New Round button — centre */}
-        <button
-          onClick={newRound}
-          className="px-6 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl transition-colors text-sm whitespace-nowrap"
-        >
-          New Round
-        </button>
-
-        {/* Hidden prompt — visible in test mode */}
-        <div className="flex-1 text-right">
-          <p className="text-gray-500 text-xs uppercase tracking-widest">AI prompt (hidden in prod)</p>
-          <p className="text-gray-300 text-sm italic">{round.prompt}</p>
+        {/* Prompt row — editable when custom mode on, read-only otherwise */}
+        <div className="flex items-start gap-2">
+          <p className="text-gray-500 text-xs uppercase tracking-widest whitespace-nowrap pt-1">
+            {useCustomPrompt ? 'Custom prompt' : 'AI prompt'}
+          </p>
+          {useCustomPrompt ? (
+            <textarea
+              value={customPromptText}
+              onChange={(e) => updateCustomPromptText(e.target.value)}
+              placeholder="Enter custom prompt keywords, e.g. volcano, mountain, cone shape, eruption…"
+              rows={2}
+              className="flex-1 px-3 py-1.5 rounded-lg bg-gray-700 text-white text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 placeholder-gray-500 resize-none"
+            />
+          ) : (
+            <p className="flex-1 text-gray-300 text-sm italic pt-0.5">{round.prompt}</p>
+          )}
         </div>
-
-        <a href="/" className="text-xs text-gray-600 hover:text-gray-400 underline ml-2 whitespace-nowrap">← Back</a>
       </div>
 
       {/* Split screen */}
