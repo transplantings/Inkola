@@ -45,6 +45,7 @@ export function TestView() {
   const toggleCustomPrompt = (on: boolean) => {
     setUseCustomPrompt(on)
     useCustomPromptRef.current = on
+    // Pre-fill on first open if empty
     if (on && !customPromptTextRef.current) {
       updateCustomPromptText(roundRef.current.prompt)
     }
@@ -60,6 +61,8 @@ export function TestView() {
     roundRef.current = next
     setCustomWord(null)
     setAiImage(null)
+    // Always sync custom prompt to the new word (whether textarea is open or not)
+    updateCustomPromptText(next.prompt)
     const editor = editorRef.current
     if (editor) {
       const ids = [...editor.getCurrentPageShapeIds()]
@@ -136,142 +139,121 @@ export function TestView() {
       <div className="flex-shrink-0 bg-gray-800 border-b border-gray-700">
 
         {/* Mobile top bar */}
-        <div className="md:hidden px-3 py-2 space-y-1.5">
-          <div className="flex items-end gap-2">
-            {/* Word input */}
+        <div className="md:hidden px-3 py-1.5 space-y-1">
+          <div className="flex items-center gap-2">
+            {/* Word — label + input stacked, flex-1 */}
             <div className="flex-1 min-w-0">
-              <p className="text-gray-500 text-[8px] uppercase tracking-widest leading-none mb-0.5">Draw this</p>
+              <p className="text-gray-500 text-[8px] uppercase tracking-widest leading-none">Draw this</p>
               <input
                 value={displayWord}
                 onChange={(e) => setCustomWord(e.target.value)}
-                className="text-sm font-extrabold text-white bg-transparent border-b border-transparent hover:border-gray-600 focus:border-indigo-500 focus:outline-none w-full py-0 transition-colors"
+                className="text-xs font-extrabold text-white bg-transparent border-b border-transparent hover:border-gray-600 focus:border-indigo-500 focus:outline-none w-full py-0 transition-colors truncate"
                 placeholder="Type a word…"
               />
             </div>
-            {/* Buttons — compact, right-aligned */}
-            <div className="flex items-center gap-1.5 flex-shrink-0">
-              <button
-                onClick={newRound}
-                className="px-2 py-1 bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white font-bold rounded-md text-[10px] touch-manipulation whitespace-nowrap"
-              >
-                New
-              </button>
-              <button
-                onClick={() => toggleCustomPrompt(!useCustomPrompt)}
-                className={`px-2 py-1 rounded-md text-[10px] font-semibold border touch-manipulation whitespace-nowrap
-                  ${useCustomPrompt ? 'bg-amber-500 border-amber-400 text-white' : 'bg-gray-700 border-gray-600 text-gray-300'}`}
-              >
-                {useCustomPrompt ? 'Prompt ✎' : 'Prompt'}
-              </button>
-              <a href="/" className="text-sm text-gray-500 hover:text-gray-300 px-1 touch-manipulation">✕</a>
-            </div>
+            {/* Buttons */}
+            <button
+              onClick={newRound}
+              className="flex-shrink-0 px-2 py-0.5 bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white font-bold rounded text-[9px] touch-manipulation"
+            >
+              New
+            </button>
+            <button
+              onClick={() => toggleCustomPrompt(!useCustomPrompt)}
+              className={`flex-shrink-0 px-2 py-0.5 rounded text-[9px] font-semibold border touch-manipulation
+                ${useCustomPrompt ? 'bg-amber-500 border-amber-400 text-white' : 'bg-gray-700 border-gray-600 text-gray-300'}`}
+            >
+              {useCustomPrompt ? 'Prompt ✎' : 'Prompt'}
+            </button>
+            <a href="/" className="flex-shrink-0 text-[10px] text-gray-500 hover:text-gray-300 touch-manipulation">✕</a>
           </div>
-          {/* Custom prompt textarea */}
           {useCustomPrompt && (
             <textarea
               value={customPromptText}
               onChange={(e) => updateCustomPromptText(e.target.value)}
               placeholder="Enter prompt keywords…"
               rows={2}
-              className="w-full px-2 py-1.5 rounded-lg bg-gray-700 text-white text-xs focus:outline-none focus:ring-2 focus:ring-amber-500 placeholder-gray-500 resize-none"
+              className="w-full px-2 py-1 rounded bg-gray-700 text-white text-[10px] focus:outline-none focus:ring-1 focus:ring-amber-500 placeholder-gray-500 resize-none"
             />
           )}
         </div>
 
         {/* Desktop top bar */}
         <div className="hidden md:flex md:flex-col px-4 py-2 gap-2">
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             <div className="flex-1 min-w-0">
-              <p className="text-gray-500 text-xs uppercase tracking-widest">Draw this</p>
+              <p className="text-gray-500 text-[10px] uppercase tracking-widest leading-none mb-0.5">Draw this</p>
               <input
                 value={displayWord}
                 onChange={(e) => setCustomWord(e.target.value)}
-                className="text-2xl font-extrabold text-white bg-transparent border-b border-transparent hover:border-gray-600 focus:border-indigo-500 focus:outline-none w-full py-0.5 transition-colors"
+                className="text-xl font-extrabold text-white bg-transparent border-b border-transparent hover:border-gray-600 focus:border-indigo-500 focus:outline-none w-full py-0 transition-colors"
                 placeholder="Type a word…"
               />
             </div>
             <button
               onClick={newRound}
-              className="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl transition-colors text-sm whitespace-nowrap"
+              className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-lg transition-colors text-xs whitespace-nowrap"
             >
               New Round
             </button>
             <button
               onClick={() => toggleCustomPrompt(!useCustomPrompt)}
-              className={`px-4 py-2 rounded-xl text-sm font-semibold border-2 transition-colors whitespace-nowrap
-                ${useCustomPrompt ? 'bg-amber-500 border-amber-300 text-white' : 'bg-gray-700 border-gray-600 text-gray-300 hover:border-amber-500 hover:text-amber-400'}`}
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition-colors whitespace-nowrap
+                ${useCustomPrompt ? 'bg-amber-500 border-amber-400 text-white' : 'bg-gray-700 border-gray-600 text-gray-300 hover:border-amber-500 hover:text-amber-400'}`}
             >
               {useCustomPrompt ? 'Custom ✎' : 'Custom prompt'}
             </button>
             <a href="/" className="text-xs text-gray-600 hover:text-gray-400 underline whitespace-nowrap">← Back</a>
           </div>
           <div className="flex items-start gap-2">
-            <p className="text-gray-500 text-xs uppercase tracking-widest whitespace-nowrap pt-1">
+            <p className="text-gray-500 text-[10px] uppercase tracking-widest whitespace-nowrap pt-0.5">
               {useCustomPrompt ? 'Custom' : 'AI prompt'}
             </p>
             {useCustomPrompt ? (
               <textarea
                 value={customPromptText}
                 onChange={(e) => updateCustomPromptText(e.target.value)}
-                placeholder="Enter custom prompt keywords, e.g. volcano, mountain, cone shape, eruption…"
+                placeholder="Enter custom prompt keywords…"
                 rows={2}
-                className="flex-1 px-3 py-1.5 rounded-lg bg-gray-700 text-white text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 placeholder-gray-500 resize-none"
+                className="flex-1 px-3 py-1 rounded-lg bg-gray-700 text-white text-xs focus:outline-none focus:ring-2 focus:ring-amber-500 placeholder-gray-500 resize-none"
               />
             ) : (
-              <p className="flex-1 text-gray-300 text-sm italic pt-0.5 line-clamp-2">{round.prompt}</p>
+              <p className="flex-1 text-gray-300 text-xs italic pt-0.5 line-clamp-2">{round.prompt}</p>
             )}
           </div>
         </div>
       </div>
 
-      {/* ── MAIN AREA ── */}
-      <div className="flex flex-1 overflow-hidden flex-col items-center md:flex-row md:items-stretch">
+      {/* ── MAIN AREA — always flex row: 70/30 mobile, 50/50 desktop ── */}
+      <div className="flex flex-1 overflow-hidden">
 
-        {/* Canvas — square on mobile (75vw), flex-1 on desktop */}
-        <div className="w-[75vw] h-[75vw] md:w-auto md:h-auto md:flex-1 relative mt-3 md:mt-0 md:border-r md:border-gray-700 flex-shrink-0">
+        {/* Canvas: 70% on mobile, 50% on desktop */}
+        <div className="flex-[7] md:flex-1 relative border-r border-gray-700 min-w-0">
           <div className="absolute inset-0">
             <Tldraw onMount={handleMount} />
           </div>
-
-          {/* Mobile AI overlay — top-right corner of canvas, 28vw square */}
-          <div
-            className="md:hidden absolute z-10 rounded-2xl overflow-hidden shadow-2xl border-2 border-gray-600 bg-gray-950"
-            style={{ width: 'min(28vw, 28vh)', height: 'min(28vw, 28vh)', top: '-6px', right: '-6px' }}
-          >
-            {aiImage ? (
-              <img src={aiImage} alt="AI" className="w-full h-full object-cover" />
-            ) : (
-              <div className="w-full h-full flex flex-col items-center justify-center gap-1">
-                {isGenerating
-                  ? <div className="w-5 h-5 border-2 border-gray-600 border-t-indigo-500 rounded-full animate-spin" />
-                  : <p className="text-[9px] text-gray-600 text-center px-2 leading-tight">AI preview</p>
-                }
-              </div>
-            )}
-          </div>
-
           <div className="absolute bottom-2 left-2 text-xs text-gray-500 pointer-events-none z-10">Raw sketch</div>
         </div>
 
-        {/* Desktop right panel */}
-        <div className="hidden md:flex flex-1 flex-col bg-gray-950">
-          <div className="flex-1 flex items-center justify-center p-4">
+        {/* AI panel: 30% on mobile, 50% on desktop */}
+        <div className="flex-[3] md:flex-1 flex flex-col bg-gray-950 min-w-0">
+          {/* AI image */}
+          <div className="flex-1 flex items-center justify-center p-1 md:p-4 min-h-0">
             {aiImage ? (
-              <img src={aiImage} alt="AI output" className="max-w-full max-h-full object-contain rounded-xl shadow-2xl" />
+              <img src={aiImage} alt="AI output" className="max-w-full max-h-full object-contain rounded-lg md:rounded-xl shadow-2xl" />
             ) : (
-              <div className="text-center space-y-3 text-gray-600">
+              <div className="text-center text-gray-600">
                 {isGenerating ? (
-                  <>
-                    <div className="w-12 h-12 border-4 border-gray-600 border-t-indigo-500 rounded-full animate-spin mx-auto" />
-                    <p className="text-sm">Generating…</p>
-                  </>
+                  <div className="w-6 h-6 md:w-12 md:h-12 border-2 md:border-4 border-gray-600 border-t-indigo-500 rounded-full animate-spin mx-auto" />
                 ) : (
-                  <p className="text-sm">Draw on the left to see the AI version</p>
+                  <p className="text-[9px] md:text-sm px-1 leading-tight">Draw to see AI</p>
                 )}
               </div>
             )}
           </div>
-          <div className="px-4 py-4 border-t border-gray-800 space-y-3 flex-shrink-0">
+
+          {/* Desktop-only controls */}
+          <div className="hidden md:block px-4 py-4 border-t border-gray-800 space-y-3 flex-shrink-0">
             <p className="text-gray-500 text-xs uppercase tracking-widest">AI Controls</p>
             <label className="block space-y-1">
               <span className="text-xs text-gray-400">Leonardo style preset</span>
@@ -305,44 +287,39 @@ export function TestView() {
         </div>
       </div>
 
-      {/* ── MOBILE CONTROLS TOGGLE (absolute, overlays canvas bottom) ── */}
+      {/* ── MOBILE CONTROLS TOGGLE — overlays bottom of canvas ── */}
       <div className="md:hidden absolute bottom-0 left-0 right-0 z-20">
         {showControls && (
-          <div className="bg-gray-900/96 backdrop-blur border-t border-gray-700 px-4 pt-3 pb-2 space-y-2">
-            <div className="flex gap-4">
+          <div className="bg-gray-900/96 backdrop-blur border-t border-gray-700 px-3 pt-2 pb-1.5 space-y-1.5">
+            <div className="flex gap-3">
               <label className="flex-1 space-y-0.5">
-                <div className="flex justify-between text-[10px] text-gray-400">
-                  <span>Strength</span>
-                  <span>{strength.toFixed(2)}</span>
+                <div className="flex justify-between text-[9px] text-gray-400">
+                  <span>Strength</span><span>{strength.toFixed(2)}</span>
                 </div>
                 <input type="range" min="0.1" max="1" step="0.05" value={strength}
                   onChange={(e) => updateStrength(parseFloat(e.target.value))}
                   className="w-full accent-indigo-500" />
               </label>
               <label className="flex-1 space-y-0.5">
-                <div className="flex justify-between text-[10px] text-gray-400">
-                  <span>Guidance</span>
-                  <span>{guidance.toFixed(1)}</span>
+                <div className="flex justify-between text-[9px] text-gray-400">
+                  <span>Guidance</span><span>{guidance.toFixed(1)}</span>
                 </div>
                 <input type="range" min="0.5" max="20" step="0.5" value={guidance}
                   onChange={(e) => updateGuidance(parseFloat(e.target.value))}
                   className="w-full accent-indigo-500" />
               </label>
             </div>
-            <select
-              value={leonardoStyle}
-              onChange={(e) => updateStyle(e.target.value as LeonardoStyle)}
-              className="w-full px-3 py-1.5 rounded-lg bg-gray-800 text-white text-xs focus:outline-none"
-            >
+            <select value={leonardoStyle} onChange={(e) => updateStyle(e.target.value as LeonardoStyle)}
+              className="w-full px-2 py-1 rounded bg-gray-800 text-white text-[10px] focus:outline-none">
               {LEONARDO_STYLES.map((s) => <option key={s} value={s}>{s}</option>)}
             </select>
           </div>
         )}
         <button
           onClick={() => setShowControls(v => !v)}
-          className="w-full py-2 bg-gray-800/95 backdrop-blur text-xs text-gray-400 font-semibold border-t border-gray-700 touch-manipulation active:bg-gray-700"
+          className="w-full py-1.5 bg-gray-800/95 backdrop-blur text-[10px] text-gray-400 font-semibold border-t border-gray-700 touch-manipulation"
         >
-          {showControls ? '▾  Hide AI Controls' : '▴  AI Controls'}
+          {showControls ? '▾ Hide Controls' : '▴ AI Controls'}
         </button>
       </div>
 
